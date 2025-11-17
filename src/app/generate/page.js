@@ -1,31 +1,36 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-// import { useSearchParams } from "next/navigation";
-import React, { useState } from "react";
+import { useSearchParams } from "next/navigation";
+import React, { useState, useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
 // import "react-toastify/dist/ReactToastify.css";
 
 const Generate = () => {
 
   const {data: session} = useSession()
+  const searchParams = useSearchParams()
 
-  const username = session?.user?.username;
+  const paramHandle = searchParams.get("handle")
+  const [handle, setHandle] = useState("")
   const [links, setLinks] = useState([{ link: "", linkText: "" }]);
   const [pic, setPic] = useState("");
   const [loading, setLoading] = useState(false)
 
+  useEffect(() => {
+    if(session?.user?.username){
+      setHandle(session.user.username)
+
+    }else if(paramHandle)
+      setHandle(paramHandle)
+    
+  }, [session, paramHandle])
+  
 
   const handleChange = (index, link, linkText) => {
-    setLinks((initialLinks) => {
-      return initialLinks.map((item, i) => {
-        if (i === index) {
-          return { link, linkText };
-        } else {
-          return item;
-        }
-      });
-    });
+    setLinks((prev) =>
+      prev.map((item, i) => (i === index ? { link, linkText } : item))
+    );
   };
 
   const addLink = () => {
@@ -33,7 +38,7 @@ const Generate = () => {
   };
 
   const submitLink = async () => {
-    if (!username) {
+    if (!handle) {
       toast.error("Please log in first!");
       return;
     }
@@ -45,7 +50,7 @@ const Generate = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          username,
+          username: handle,
           links,
           pic,
         }),
@@ -69,18 +74,18 @@ const Generate = () => {
   };
 
   return (
-    <div className="bg-[#2665d6] min-h-screen grid grid-cols-2 pt-6">
-      <div className="text-white flex flex-col justify-center items-left ps-20">
+    <div className="bg-[#2665d6] min-h-screen grid grid-cols-2 pt-6 max-[778px]:grid-cols-1">
+      <div className="text-white flex flex-col justify-center items-left ps-20 max-[778px]:px-10 max-[778px]:pt-20">
         <h1 className="font-semibold text-4xl">Generate Your Master Link!</h1>
         <ToastContainer />
         <div className="flex flex-col gap-3 mt-3">
           <div className="flex flex-col gap-1">
             <label htmlFor="">Your Handle (Auto-filled from login)</label>
             <input
-              value={username || ""}
-              disabled
+              value={handle || ""}
+              onChange={(e) => setHandle(e.target.value)}
               className="bg-white rounded-lg py-2 px-2 text-black focus:outline-none"
-              placeholder={username}
+              placeholder="Enter your handle"
               type="text"
               name=""
               id=""
@@ -129,18 +134,6 @@ const Generate = () => {
           </div>
 
           <div className="flex flex-col gap-1">
-            {/* <label htmlFor="">Your Picture Link</label>
-            <input
-              value={pic || ""}
-              onChange={(e) => {
-                setPic(e.target.value);
-              }}
-              className="bg-white rounded-lg py-2 px-2 text-black focus:outline-none"
-              placeholder="Link for your picture"
-              type="text"
-              name=""
-              id=""
-            /> */}
             <button
               onClick={()=>submitLink()}
               disabled={loading}
@@ -154,7 +147,7 @@ const Generate = () => {
         </div>
       </div>
 
-      <div className="h-full">
+      <div className="h-full mx-auto">
         <img className="mt-[5vw]" src="images/ss.PNG" alt="" />
       </div>
     </div>

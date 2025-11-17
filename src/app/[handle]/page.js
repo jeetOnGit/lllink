@@ -1,16 +1,25 @@
-
+"use client"
 // [handle]/page.js
 import Link from "next/link";
-import clientPromise from "../../../lib/mongodb";
+// import clientPromise from "../../../lib/mongodb";
+import { useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
 
 
 
-export default async function Page({ params }) {
+export default function Page() {
+  const {data: session} = useSession()
+  // const { handle } = await params;
+  const [user, setUser] = useState({})
 
-  const { handle } = await params;
-  const client = await clientPromise;
-  const db = client.db("linktree");
-  const user = await db.collection("users").findOne({ username: handle.toLowerCase() });
+  useEffect(()=>{
+    if(session?.user){
+      setUser(session.user)
+    }
+  },[session])
+  // const client = await clientPromise;
+  // const db = client.db("linktree");
+  // const user = await db.collection("users").findOne({ username: handle.toLowerCase() });
   
   if (!user) {
     return <div className="text-center text-red-500">User not found <Link href='/login'>Try Login</Link></div>;
@@ -20,7 +29,7 @@ export default async function Page({ params }) {
   return <div className="flex min-h-screen bg-white justify-center items-center">
     <div className="flex flex-col justify-between gap-2 w-[50vw]   py-12 rounded-md">
       <div className="flex flex-col justify-between items-center gap-3">
-        <img className="w-12 h-12" src={user.pic || "vercel.svg"} alt="Processing Picture" />
+        <img className="w-12 h-12" src={user.image || "vercel.svg"} alt="Processing Picture" />
         <h5 className="font-semibold text-2xl">@{user.username}</h5>
         <p>Lorem ipsum dolor sit amet.</p>
       </div>
