@@ -140,17 +140,16 @@ export default function Home() {
       <footer className="bg-gray-900 text-gray-400 py-10 mt-auto">
         <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="text-center md:text-left">
-            <h3 className="text-white font-bold text-lg mb-2">Linktree Clone</h3>
+            <h3 className="text-white font-bold text-lg mb-2">lllink</h3>
             <p className="text-sm text-gray-500">
-              Made with ❤️ by Jeet using Next.js + Tailwind CSS
+              Made with ❤️ by Jeet using Next.js
             </p>
           </div>
 
           <ul className="flex gap-6 text-sm">
-            <Link href="/" className="hover:text-white">Privacy</Link>
-            <Link href="/" className="hover:text-white">Terms</Link>
-            <Link href="/" className="hover:text-white">Contact</Link>
-            <Link href="/" className="hover:text-white">GitHub</Link>
+            <Link href="https://jeetonweb.netlify.app/" className="hover:text-white">Portfolio</Link>
+            <Link href="https://www.linkedin.com/in/connectwithjeet/" className="hover:text-white">Contact</Link>
+            <Link href="https://github.com/jeetOnGit/lllink" className="hover:text-white">GitHub</Link>
           </ul>
         </div>
 

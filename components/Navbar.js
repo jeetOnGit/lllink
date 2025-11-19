@@ -5,14 +5,14 @@ import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 const Navbar = () => {
-  const { data: session } = useSession();
-  const [user, setUser] = useState("");
+  const { data: session, status } = useSession();
+  // const [user, setUser] = useState("");
 
-  useEffect(() => {
-    if (session?.user?.username) {
-      setUser(session?.user?.username);
-    }
-  }, [session]);
+  // useEffect(() => {
+  //   if (session?.user?.username) {
+  //     setUser(session?.user?.username);
+  //   }
+  // }, [session]);
 
   const pathName = usePathname();
   const shwoNavBar = ["/", "/generate"].includes(pathName);
@@ -49,29 +49,40 @@ const Navbar = () => {
             </ul>
           </div>
 
-          {user ? (
+         {status === "loading" && (
             <div className="flex gap-3 items-center">
-              <p>Hi, {user}</p>
-              <button className="bg-gray-300 rounded-lg px-6 py-3 cursor-pointer max-[640px]:px-3 max-[640px]:py-2" onClick={()=>signOut({callbackUrl: "/"})}>
+              <p>Loading...</p>
+            </div>
+          )}
+
+          {/* 2. Authenticated State */}
+          {status === "authenticated" && (
+            <div className="flex gap-3 items-center">
+              <p>Hi, {session.user.username || session.user.name}</p>
+              <button
+                className="bg-gray-300 rounded-lg px-6 py-3 cursor-pointer max-[640px]:px-3 max-[640px]:py-2"
+                onClick={() => signOut({ callbackUrl: "/" })}
+              >
                 Log out
               </button>
             </div>
-          ) : (
+          )}
+
+          {/* 3. Unauthenticated State */}
+          {status === "unauthenticated" && (
             <div className="flex gap-3">
-              <button>
-                <Link
-                  className="bg-gray-300 rounded-lg px-6 py-3 max-[640px]:px-3 max-[640px]:py-2"
-                  href="/login">
-                  Log in
-                </Link>
-              </button>
-              <button className="">
-                <Link
-                  className="bg-gray-800 px-8 py-3 rounded-full text-white max-[640px]:px-3 max-[640px]:py-2"
-                  href="/register">
-                  Sign up
-                </Link>
-              </button>
+              <Link
+                className="bg-gray-300 rounded-lg px-6 py-3 max-[640px]:px-3 max-[640px]:py-2"
+                href="/login"
+              >
+                Log in
+              </Link>
+              <Link
+                className="bg-gray-800 px-8 py-3 rounded-full text-white max-[640px]:px-3 max-[640px]:py-2"
+                href="/register"
+              >
+                Sign up
+              </Link>
             </div>
           )}
         </nav>
