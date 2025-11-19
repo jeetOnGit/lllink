@@ -2,30 +2,28 @@
 
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { ToastContainer, toast } from "react-toastify";
 // import "react-toastify/dist/ReactToastify.css";
 
-const Generate = () => {
+// 1. Move all the main logic into a child component
+const GenerateContent = () => {
+  const { data: session } = useSession();
+  const searchParams = useSearchParams();
 
-  const {data: session} = useSession()
-  const searchParams = useSearchParams()
-
-  const paramHandle = searchParams.get("handle")
-  const [handle, setHandle] = useState("")
+  const paramHandle = searchParams.get("handle");
+  const [handle, setHandle] = useState("");
   const [links, setLinks] = useState([{ link: "", linkText: "" }]);
   const [pic, setPic] = useState("");
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if(session?.user?.username){
-      setHandle(session.user.username)
-
-    }else if(paramHandle)
-      setHandle(paramHandle)
-    
-  }, [session, paramHandle])
-  
+    if (session?.user?.username) {
+      setHandle(session.user.username);
+    } else if (paramHandle) {
+      setHandle(paramHandle);
+    }
+  }, [session, paramHandle]);
 
   const handleChange = (index, link, linkText) => {
     setLinks((prev) =>
@@ -87,12 +85,8 @@ const Generate = () => {
               className="bg-white rounded-lg py-2 px-2 text-black focus:outline-none"
               placeholder="Enter your handle"
               type="text"
-              name=""
-              id=""
             />
           </div>
-
-          {/* <div className="flex flex-col gap-1"></div> */}
 
           <div className="flex flex-col gap-1">
             <label htmlFor="">Enter Your Link</label>
@@ -108,8 +102,6 @@ const Generate = () => {
                       className="bg-white rounded-lg py-2 px-2 text-black focus:outline-none"
                       placeholder="Your Link e.g https://www.google.com/"
                       type="text"
-                      name=""
-                      id=""
                     />
                     <input
                       value={item.linkText || ""}
@@ -119,8 +111,6 @@ const Generate = () => {
                       className="bg-white rounded-lg py-2 px-2 text-black focus:outline-none"
                       placeholder="Your text"
                       type="text"
-                      name=""
-                      id=""
                     />
                   </div>
                 );
@@ -128,14 +118,15 @@ const Generate = () => {
 
             <button
               onClick={() => addLink()}
-              className="bg-black text-white px-6 py-2 rounded-full cursor-pointer text-left w-fit">
+              className="bg-black text-white px-6 py-2 rounded-full cursor-pointer text-left w-fit"
+            >
               + Add link
             </button>
           </div>
 
           <div className="flex flex-col gap-1">
             <button
-              onClick={()=>submitLink()}
+              onClick={() => submitLink()}
               disabled={loading}
               className={`bg-black text-white w-fit px-6 py-2 rounded-full mt-2 ${
                 loading ? "opacity-70 cursor-not-allowed" : ""
@@ -151,6 +142,15 @@ const Generate = () => {
         <img className="mt-[5vw]" src="images/ss.PNG" alt="" />
       </div>
     </div>
+  );
+};
+
+// 2. Wrap the content in Suspense to fix the Netlify build error
+const Generate = () => {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#2665d6] text-white flex justify-center items-center">Loading...</div>}>
+      <GenerateContent />
+    </Suspense>
   );
 };
 
